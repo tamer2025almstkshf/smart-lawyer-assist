@@ -1,7 +1,7 @@
 steps:
 # Build the container image
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'gcr.io/$PROJECT_ID/my-app:$SHORT_SHA', '.']
+  args: ['build', '-t', 'gcr.io/$smart-lawyer-assist/my-app:$SHORT_SHA', '.']
 
 # Run tests
 - name: 'gcr.io/cloud-builders/docker'
@@ -19,10 +19,10 @@ steps:
     - deploy
     - my-app
     - --image=gcr.io/$smart-lawyer-assist/my-app:$SHORT_SHA
-    - --region=us-central1
+    - --region=us-west1
     - --platform=managed
     - --allow-unauthenticated
   entrypoint: gcloud
 
 images:
-- 'gcr.io/$PROJECT_ID/my-app:$SHORT_SHA'
+- 'gcr.io/$smart-lawyer-assist/my-app:$SHORT_SHA'

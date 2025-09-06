@@ -1,28 +1,99 @@
-steps:
-# Build the container image
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'gcr.io/$smart-lawyer-assist/my-app:$SHORT_SHA', '.']
-
-# Run tests
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['run', 'gcr.io/$smart-lawyer-assist/my-app:$SHORT_SHA', 'npm', 'test']
-
-# Push the container image to Container Registry
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['push', 'gcr.io/$smart-lawyer-assist/my-app:$SHORT_SHA']
-
-# Deploy to Cloud Run
-- name: 'gcr.io/google.com/cloudsdk/cloud-sdk'
-  args:
-    - gcloud
-    - run
-    - deploy
-    - my-app
-    - --image=gcr.io/$smart-lawyer-assist/my-app:$SHORT_SHA
-    - --region=us-west1
-    - --platform=managed
-    - --allow-unauthenticated
-  entrypoint: gcloud
-
-images:
-- 'gcr.io/$smart-lawyer-assist/my-app:$SHORT_SHA'
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: lexra-law-management
+  namespace: '297435687644'
+  selfLink: /apis/serving.knative.dev/v1/namespaces/297435687644/services/lexra-law-management
+  uid: 98d7064e-7129-4ce1-8e1b-444606ac6349
+  resourceVersion: AAY+F/jiYJ0
+  generation: 87
+  creationTimestamp: '2025-09-04T17:04:35.669281Z'
+  labels:
+    managed-by: google-ai-studio
+    gcb-trigger-id: 86fbe0d0-f8d9-4d63-93de-65f2369f74bb
+    gcb-trigger-region: global
+    cloud.googleapis.com/location: us-west1
+  annotations:
+    serving.knative.dev/creator: ceo@almstkshf.com
+    serving.knative.dev/lastModifier: ceo@almstkshf.com
+    generativelanguage.googleapis.com/type: applet
+    run.googleapis.com/client-name: cloud-console
+    run.googleapis.com/ingress: all
+    run.googleapis.com/operation-id: 6e6ca63d-e1b0-47bb-8725-90b0b9a2a216
+    run.googleapis.com/ingress-status: all
+    run.googleapis.com/invoker-iam-disabled: 'true'
+    run.googleapis.com/build-source-location: gs://ai-studio-bucket-297435687644-us-west1/services/lexra-law-management/version-87/source.zip
+    run.googleapis.com/build-enable-automatic-updates: 'false'
+    run.googleapis.com/urls: '["https://lexra-law-management-297435687644.us-west1.run.app","https://lexra-law-management-gz52mf5toq-uw.a.run.app"]'
+spec:
+  template:
+    metadata:
+      labels:
+        run.googleapis.com/startupProbeType: Default
+      annotations:
+        run.googleapis.com/sessionAffinity: 'false'
+        autoscaling.knative.dev/minScale: '0'
+        autoscaling.knative.dev/maxScale: '3'
+        run.googleapis.com/base-images: '{"":"us-central1-docker.pkg.dev/serverless-runtimes/google-22/runtimes/nodejs22"}'
+        run.googleapis.com/cpu-throttling: 'true'
+    spec:
+      containerConcurrency: 80
+      timeoutSeconds: 300
+      serviceAccountName: 297435687644-compute@developer.gserviceaccount.com
+      containers:
+      - image: us-docker.pkg.dev/cloudrun/container/aistudio/applet-proxy
+        ports:
+        - name: http1
+          containerPort: 8080
+        env:
+        - name: API_KEY
+          value: AIzaSyBXZHpz_QLkr-ZilAhL4jwzGiJfJo10i1g
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 512Mi
+        volumeMounts:
+        - name: applet
+          mountPath: /app/dist
+        startupProbe:
+          timeoutSeconds: 240
+          periodSeconds: 240
+          failureThreshold: 1
+          tcpSocket:
+            port: 8080
+      volumes:
+      - name: applet
+        csi:
+          driver: gcsfuse.run.googleapis.com
+          readOnly: true
+          volumeAttributes:
+            bucketName: ai-studio-bucket-297435687644-us-west1
+            mountOptions: only-dir=services/lexra-law-management/version-87/compiled
+      runtimeClassName: run.googleapis.com/linux-base-image-update
+  traffic:
+  - percent: 100
+    latestRevision: true
+status:
+  observedGeneration: 87
+  conditions:
+  - type: Ready
+    status: 'True'
+    lastTransitionTime: '2025-09-06T01:35:41.019293Z'
+  - type: BaseImageValidated
+    status: 'True'
+    severity: Info
+  - type: ConfigurationsReady
+    status: 'True'
+    lastTransitionTime: '2025-09-06T01:35:39.585537Z'
+  - type: RoutesReady
+    status: 'True'
+    lastTransitionTime: '2025-09-06T01:35:40.986193Z'
+  latestReadyRevisionName: lexra-law-management-00087-6c7
+  latestCreatedRevisionName: lexra-law-management-00087-6c7
+  traffic:
+  - revisionName: lexra-law-management-00087-6c7
+    percent: 100
+    latestRevision: true
+  url: https://lexra-law-management-gz52mf5toq-uw.a.run.app
+  address:
+    url: https://lexra-law-management-gz52mf5toq-uw.a.run.app
